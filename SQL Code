@@ -115,6 +115,49 @@ INSERT INTO TrainStaff(StaffID, TrainID, StaffName, RolePosition, ContactInforma
 VALUES  ('d-10' , 'TLE-632' , 'Jerry' , 'Driver' , '---' , 'Employee Since 2010' ), 
 		('c-02' , 'SLE-941' , 'Jimmy' , 'Maintenance' , '---' , 'Employee Since 2017' ),
         ('c-07' , 'KLE-507' , 'Main Kiun Bataon' , 'Maintenance' , '---' , 'Employee Since 2022' );
+        
+        
+-- Create a view to display detailed information about scheduled trains
+CREATE VIEW ScheduledTrainsInfo AS
+SELECT 
+    Scheduled.ScheduleID,
+    Scheduled.DepartureTime,
+    Scheduled.ArrivalTime,
+    Scheduled.OtherDetails AS ScheduleDetails,
+    Trains.TrainID,
+    Trains.TrainName,
+    Trains.TypeOfTrain,
+    Trains.SeatsAvailable,
+    Routes.DepartureStationID AS DepartureID,
+    DepartureStation.StationName AS DepartureStationName,
+    Routes.ArrivalStationID AS ArrivalID,
+    ArrivalStation.StationName AS ArrivalStationName,
+    Routes.DistanceInKM,
+    Routes.Duration,
+    Routes.OtherDetails AS RouteDetails
+FROM Scheduled
+JOIN Trains ON Scheduled.TrainID = Trains.TrainID
+JOIN Routes ON Scheduled.RouteID = Routes.RouteID
+JOIN Stations DepartureStation ON Routes.DepartureStationID = DepartureStation.StationID
+JOIN Stations ArrivalStation ON Routes.ArrivalStationID = ArrivalStation.StationID;
+
+-- Create a view to display passenger and ticket information
+CREATE VIEW PassengerTicketInfo AS
+SELECT 
+    Tickets.TicketID,
+    Passengers.PassengerID,
+    Passengers.PassengerName,
+    Passengers.ContactInformation,
+    Tickets.SeatNumber,
+    Tickets.TicketPrice,
+    Tickets.OtherDetails AS TicketDetails,
+    Scheduled.ScheduleID,
+    Scheduled.DepartureTime,
+    Scheduled.ArrivalTime
+FROM Passengers
+JOIN Tickets ON Passengers.PassengerID = Tickets.PassengerID
+JOIN Scheduled ON Tickets.ScheduleID = Scheduled.ScheduleID;
+
 
 
 drop table Trains;
@@ -125,3 +168,5 @@ SELECT Stations.StationID, Stations.StationName, Routes.RouteID, Routes.ArrivalS
 FROM Stations
 INNER JOIN Routes ON Routes.ArrivalStationID = Stations.StationID;
 DESC Routes;
+select * from ScheduledTrainsInfo;
+select * from PassengerTicketInfo;
